@@ -1,0 +1,26 @@
+# /etc/conf.d/safeinsured: config file for /etc/init.d/safeinsured
+
+# Config file location
+#BITCOIND_CONFIGFILE="/etc/safeinsure/safeinsure.conf"
+
+# What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
+#BITCOIND_PIDDIR="/var/run/safeinsured"
+
+# What filename to give the pidfile
+#BITCOIND_PIDFILE="${BITCOIND_PIDDIR}/safeinsured.pid"
+
+# Where to write safeinsured data (be mindful that the blockchain is large)
+#BITCOIND_DATADIR="/var/lib/safeinsured"
+
+# User and group to own safeinsured process
+#BITCOIND_USER="safeinsure"
+#BITCOIND_GROUP="safeinsure"
+
+# Path to safeinsured executable
+#BITCOIND_BIN="/usr/bin/safeinsured"
+
+# Nice value to run safeinsured under
+#BITCOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+BITCOIND_OPTS=""

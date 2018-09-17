@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=SafeInsure
+Comment=SafeInsure P2P Cryptocurrency
+Comment[fr]=SafeInsure, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=SafeInsure, eşten eşe kriptografik sanal para birimi
+Exec=safeinsure-qt %u
+Terminal=false
+Type=Application
+Icon=safeinsure128
+MimeType=x-scheme-handler/safeinsure;
+Categories=Office;Finance;

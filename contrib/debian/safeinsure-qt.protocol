@@ -1,0 +1,11 @@
+[Protocol]
+exec=safeinsure-qt '%u'
+protocol=safeinsure
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false
