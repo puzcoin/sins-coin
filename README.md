@@ -32,8 +32,8 @@ More information at [safeinsure.io](https://www.safeinsure.io)
 <tr>
 <th scope="col">BLock no</th>
 <th scope="col">Reward / block</th>
-<th scope="col">Masternodes</th>
-<th scope="col">Staking</th> 
+<th scope="col">Staking</th>
+<th scope="col">Masternodes</th> 
 </tr>
 </thead>
 <tbody>
