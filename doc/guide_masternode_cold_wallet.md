@@ -4,10 +4,10 @@
 This guide is for a single masternode, on a Ubuntu 16.04 64bit server(1GB RAM) and will be controlled from the wallet on your local computer.
 
 First the basic requirements:
--1000 SINS (https://crex24.com/exchange/SINS-BTC)
--A main computer(Your everyday computer)
--Masternode Server(The computer that will be on 24/7)
--A unique IP address for EACH masternode
+* 1000 SINS (https://crex24.com/exchange/SINS-BTC)
+* A main computer(Your everyday computer)
+* Masternode Server(The computer that will be on 24/7)
+* A unique IP address for EACH masternode
 
 The basic reasoning for these requirements is that, you get to keep your SINS in your local wallet, and host your masternode remotely, securely.
 
