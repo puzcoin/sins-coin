@@ -3,7 +3,7 @@ SafeInsure Core
 
 Setup
 ---------------------
-[SafeInsure Core](http://safeinsure.org/wallet) is the original SafeInsure client and it builds the backbone of the network. However, it downloads and stores the entire history of SafeInsure transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
+[SafeInsure Core](http://safeinsure.io/ is the original SafeInsure client and it builds the backbone of the network. However, it downloads and stores the entire history of SafeInsure transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
 
 Running
 ---------------------
@@ -13,8 +13,8 @@ The following are some helpful notes on how to run SafeInsure on your native pla
 
 Unpack the files into a directory and run:
 
-- bin/32/safeinsure-qt (GUI, 32-bit) or bin/32/safeinsured (headless, 32-bit)
-- bin/64/safeinsure-qt (GUI, 64-bit) or bin/64/safeinsured (headless, 64-bit)
+- safeinsure-qt (GUI, 32-bit) or safeinsured (headless, 32-bit)
+- safeinsure-qt (GUI, 64-bit) or safeinsured (headless, 64-bit)
 
 ### Windows
 
@@ -26,10 +26,10 @@ Drag SafeInsure-Qt to your applications folder, and then run SafeInsure-Qt.
 
 ### Need Help?
 
-* See the documentation at the [SafeInsure Wiki](https://en.bitcoin.it/wiki/Main_Page) ***TODO***
+***TODO***
 for help and more information.
-* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or on the [SafeInsure Forum](http://forum.safeinsure.org/).
-* Join one of our Slack groups [SafeInsure Slack Groups](https://safeinsure.org/slack-logins/).
+* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=5031712.0)
+* Join one of our Discord group [SafeInsure Discord Group](https://discord.gg/7rDuEwm).
 
 Building
 ---------------------
@@ -41,7 +41,7 @@ The following are developer notes on how to build SafeInsure on your native plat
 
 Development
 ---------------------
-The SafeInsure repo's [root README](https://github.com/safeinsure/sinscore/blob/master/README.md) contains relevant information on the development process and automated testing.
+The SafeInsure repo's [root README](https://github.com/safeinsure/sins-coin/blob/master/README.md) contains relevant information on the development process and automated testing.
 
 - [Developer Notes](developer-notes.md)
 - [Multiwallet Qt Development](multiwallet-qt.md)
@@ -55,8 +55,8 @@ The SafeInsure repo's [root README](https://github.com/safeinsure/sinscore/blob/
 
 ### Resources
 
-* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or the [SafeInsure](http://forum.safeinsure.org/) forum.
-* Join the [SafeInsure-Dev](https://safeinsure-dev.slack.com/) Slack group ([Sign-Up](https://safeinsure-dev.herokuapp.com/)).
+* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=5031712.0).
+* Join the Discord group [SafeInsure Discord Group](https://discord.gg/7rDuEwm).
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)

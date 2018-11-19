@@ -50,7 +50,7 @@ static const int MAX_URI_LENGTH = 255;
 #define SPINNER_FRAMES 35
 
 #define QAPP_ORG_NAME "SafeInsure"
-#define QAPP_ORG_DOMAIN "safeinsure.org"
+#define QAPP_ORG_DOMAIN "safeinsure.io"
 #define QAPP_APP_NAME_DEFAULT "SafeInsure-Qt"
 #define QAPP_APP_NAME_TESTNET "SafeInsure-Qt-testnet"
 
