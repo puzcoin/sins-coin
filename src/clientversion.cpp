@@ -45,8 +45,8 @@ const std::string CLIENT_NAME("SafeInsure Core");
 //! git will put "#define GIT_ARCHIVE 1" on the next line inside archives.
 #define GIT_ARCHIVE 1
 #ifdef GIT_ARCHIVE
-#define GIT_COMMIT_ID "reva857"
-#define GIT_COMMIT_DATE "19 Nov 2018 00:00:00 +0000"
+#define GIT_COMMIT_ID "meet19"
+#define GIT_COMMIT_DATE "07 Jan 2019 06:00:00 +0000"
 #endif
 
 #define BUILD_DESC_WITH_SUFFIX(maj, min, rev, build, suffix) \

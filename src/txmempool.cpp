@@ -16,30 +16,20 @@
 
 using namespace std;
 
-CTxMemPoolEntry::CTxMemPoolEntry() : nFee(0), nTxSize(0), nModSize(0), nTime(0), dPriority(0.0)
+CTxMemPoolEntry::CTxMemPoolEntry() : nFee(0), nTxSize(0), nTime(0)
 {
     nHeight = MEMPOOL_HEIGHT;
 }
 
-CTxMemPoolEntry::CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee, int64_t _nTime, double _dPriority, unsigned int _nHeight) : tx(_tx), nFee(_nFee), nTime(_nTime), dPriority(_dPriority), nHeight(_nHeight)
+CTxMemPoolEntry::CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee, int64_t _nTime, unsigned int _nHeight) : tx(_tx), nFee(_nFee), nTime(_nTime), nHeight(_nHeight)
 {
     nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
 
-    nModSize = tx.CalculateModifiedSize(nTxSize);
 }
 
 CTxMemPoolEntry::CTxMemPoolEntry(const CTxMemPoolEntry& other)
 {
     *this = other;
-}
-
-double
-CTxMemPoolEntry::GetPriority(unsigned int currentHeight) const
-{
-    CAmount nValueIn = tx.GetValueOut() + nFee;
-    double deltaPriority = ((double)(currentHeight - nHeight) * nValueIn) / nModSize;
-    double dResult = dPriority + deltaPriority;
-    return dResult;
 }
 
 /**
@@ -49,7 +39,6 @@ class CBlockAverage
 {
 private:
     boost::circular_buffer<CFeeRate> feeSamples;
-    boost::circular_buffer<double> prioritySamples;
 
     template <typename T>
     std::vector<T> buf2vec(boost::circular_buffer<T> buf) const
@@ -59,16 +48,11 @@ private:
     }
 
 public:
-    CBlockAverage() : feeSamples(100), prioritySamples(100) {}
+    CBlockAverage() : feeSamples(100) {}
 
     void RecordFee(const CFeeRate& feeRate)
     {
         feeSamples.push_back(feeRate);
-    }
-
-    void RecordPriority(double priority)
-    {
-        prioritySamples.push_back(priority);
     }
 
     size_t FeeSamples() const { return feeSamples.size(); }
@@ -77,13 +61,6 @@ public:
         BOOST_FOREACH (const CFeeRate& f, feeSamples)
             insertInto.push_back(f);
         return feeSamples.size();
-    }
-    size_t PrioritySamples() const { return prioritySamples.size(); }
-    size_t GetPrioritySamples(std::vector<double>& insertInto) const
-    {
-        BOOST_FOREACH (double d, prioritySamples)
-            insertInto.push_back(d);
-        return prioritySamples.size();
     }
 
     /**
@@ -123,8 +100,6 @@ public:
     {
         std::vector<CFeeRate> vecFee = buf2vec(feeSamples);
         fileout << vecFee;
-        std::vector<double> vecPriority = buf2vec(prioritySamples);
-        fileout << vecPriority;
     }
 
     void Read(CAutoFile& filein, const CFeeRate& minRelayFee)
@@ -135,15 +110,9 @@ public:
             feeSamples.insert(feeSamples.end(), vecFee.begin(), vecFee.end());
         else
             throw runtime_error("Corrupt fee value in estimates file.");
-        std::vector<double> vecPriority;
-        filein >> vecPriority;
-        if (AreSane(vecPriority))
-            prioritySamples.insert(prioritySamples.end(), vecPriority.begin(), vecPriority.end());
-        else
-            throw runtime_error("Corrupt priority value in estimates file.");
-        if (feeSamples.size() + prioritySamples.size() > 0)
-            LogPrint("estimatefee", "Read %d fee samples and %d priority samples\n",
-                feeSamples.size(), prioritySamples.size());
+        if (feeSamples.size() > 0)
+            LogPrint("estimatefee", "Read %d fee samples\n",
+                feeSamples.size());
     }
 };
 
@@ -156,7 +125,6 @@ private:
      */
     std::vector<CBlockAverage> history;
     std::vector<CFeeRate> sortedFeeSamples;
-    std::vector<double> sortedPrioritySamples;
 
     int nBestSeenHeight;
 
@@ -164,7 +132,7 @@ private:
      * nBlocksAgo is 0 based, i.e. transactions that confirmed in the highest seen block are
      * nBlocksAgo == 0, transactions in the block before that are nBlocksAgo == 1 etc.
      */
-    void seenTxConfirm(const CFeeRate& feeRate, const CFeeRate& minRelayFee, double dPriority, int nBlocksAgo)
+    void seenTxConfirm(const CFeeRate& feeRate, const CFeeRate& minRelayFee, int nBlocksAgo)
     {
         // Last entry records "everything else".
         int nBlocksTruncated = min(nBlocksAgo, (int)history.size() - 1);
@@ -173,20 +141,16 @@ private:
         // We need to guess why the transaction was included in a block-- either
         // because it is high-priority or because it has sufficient fees.
         bool sufficientFee = (feeRate > minRelayFee);
-        bool sufficientPriority = AllowFree(dPriority);
         const char* assignedTo = "unassigned";
-        if (sufficientFee && !sufficientPriority && CBlockAverage::AreSane(feeRate, minRelayFee)) {
+        if (sufficientFee && CBlockAverage::AreSane(feeRate, minRelayFee)) {
             history[nBlocksTruncated].RecordFee(feeRate);
             assignedTo = "fee";
-        } else if (sufficientPriority && !sufficientFee && CBlockAverage::AreSane(dPriority)) {
-            history[nBlocksTruncated].RecordPriority(dPriority);
-            assignedTo = "priority";
         } else {
             // Neither or both fee and priority sufficient to get confirmed:
             // don't know why they got confirmed.
         }
-        LogPrint("estimatefee", "Seen TX confirm: %s : %s fee/%g priority, took %d blocks\n",
-            assignedTo, feeRate.ToString(), dPriority, nBlocksAgo);
+        LogPrint("estimatefee", "Seen TX confirm: %s : %s fee, took %d blocks\n",
+            assignedTo, feeRate.ToString(), nBlocksAgo);
     }
 
 public:
@@ -234,22 +198,20 @@ public:
             BOOST_FOREACH (const CTxMemPoolEntry* entry, e) {
                 // Fees are stored and reported as BTC-per-kb:
                 CFeeRate feeRate(entry->GetFee(), entry->GetTxSize());
-                double dPriority = entry->GetPriority(entry->GetHeight()); // Want priority when it went IN
-                seenTxConfirm(feeRate, minRelayFee, dPriority, i);
+                seenTxConfirm(feeRate, minRelayFee, i);
             }
         }
 
         //After new samples are added, we have to clear the sorted lists,
         //so they'll be resorted the next time someone asks for an estimate
         sortedFeeSamples.clear();
-        sortedPrioritySamples.clear();
 
         for (size_t i = 0; i < history.size(); i++) {
-            if (history[i].FeeSamples() + history[i].PrioritySamples() > 0)
-                LogPrint("estimatefee", "estimates: for confirming within %d blocks based on %d/%d samples, fee=%s, prio=%g\n",
+            if (history[i].FeeSamples() > 0)
+                LogPrint("estimatefee", "estimates: for confirming within %d blocks based on %d samples, fee=%s\n",
                     i,
-                    history[i].FeeSamples(), history[i].PrioritySamples(),
-                    estimateFee(i + 1).ToString(), estimatePriority(i + 1));
+                    history[i].FeeSamples(), 
+                    estimateFee(i + 1).ToString());
         }
     }
 
@@ -288,35 +250,6 @@ public:
             nPrevSize += history.at(i).FeeSamples();
         size_t index = min(nPrevSize + nBucketSize / 2, sortedFeeSamples.size() - 1);
         return sortedFeeSamples[index];
-    }
-    double estimatePriority(int nBlocksToConfirm)
-    {
-        nBlocksToConfirm--;
-
-        if (nBlocksToConfirm < 0 || nBlocksToConfirm >= (int)history.size())
-            return -1;
-
-        if (sortedPrioritySamples.size() == 0) {
-            for (size_t i = 0; i < history.size(); i++)
-                history.at(i).GetPrioritySamples(sortedPrioritySamples);
-            std::sort(sortedPrioritySamples.begin(), sortedPrioritySamples.end(),
-                std::greater<double>());
-        }
-        if (sortedPrioritySamples.size() < 11)
-            return -1.0;
-
-        int nBucketSize = history.at(nBlocksToConfirm).PrioritySamples();
-
-        // Estimates should not increase as number of confirmations needed goes up,
-        // but the estimates are noisy because confirmations happen discretely
-        // in blocks. To smooth out the estimates, use all samples in the history
-        // and use the nth highest where n is (number of samples in previous buckets +
-        // half the samples in nBlocksToConfirm bucket).
-        size_t nPrevSize = 0;
-        for (int i = 0; i < nBlocksToConfirm; i++)
-            nPrevSize += history.at(i).PrioritySamples();
-        size_t index = min(nPrevSize + nBucketSize / 2, sortedPrioritySamples.size() - 1);
-        return sortedPrioritySamples[index];
     }
 
     void Write(CAutoFile& fileout) const
@@ -463,7 +396,7 @@ void CTxMemPool::remove(const CTransaction& origTx, std::list<CTransaction>& rem
     }
 }
 
-void CTxMemPool::removeCoinbaseSpends(const CCoinsViewCache* pcoins, unsigned int nMemPoolHeight)
+void CTxMemPool::removeCoinbaseSpends(const CCoinsViewCache* pcoins, int nMemPoolHeight)
 {
     // Remove transactions spending a coinbase which are now immature
     LOCK(cs);
@@ -633,11 +566,6 @@ CFeeRate CTxMemPool::estimateFee(int nBlocks) const
     LOCK(cs);
     return minerPolicyEstimator->estimateFee(nBlocks);
 }
-double CTxMemPool::estimatePriority(int nBlocks) const
-{
-    LOCK(cs);
-    return minerPolicyEstimator->estimatePriority(nBlocks);
-}
 
 bool CTxMemPool::WriteFeeEstimates(CAutoFile& fileout) const
 {
@@ -670,26 +598,24 @@ bool CTxMemPool::ReadFeeEstimates(CAutoFile& filein)
     return true;
 }
 
-void CTxMemPool::PrioritiseTransaction(const uint256 hash, const string strHash, double dPriorityDelta, const CAmount& nFeeDelta)
+void CTxMemPool::PrioritiseTransaction(const uint256 hash, const string strHash, const CAmount& nFeeDelta)
 {
     {
         LOCK(cs);
-        std::pair<double, CAmount>& deltas = mapDeltas[hash];
-        deltas.first += dPriorityDelta;
-        deltas.second += nFeeDelta;
+        CAmount &delta = mapDeltas[hash];
+        delta += nFeeDelta;        
     }
-    LogPrintf("PrioritiseTransaction: %s priority += %f, fee += %d\n", strHash, dPriorityDelta, FormatMoney(nFeeDelta));
+    LogPrintf("PrioritiseTransaction: %s, feerate += %d\n", strHash, FormatMoney(nFeeDelta));
 }
 
-void CTxMemPool::ApplyDeltas(const uint256 hash, double& dPriorityDelta, CAmount& nFeeDelta)
+void CTxMemPool::ApplyDelta(const uint256 hash, CAmount& nFeeDelta)
 {
     LOCK(cs);
-    std::map<uint256, std::pair<double, CAmount> >::iterator pos = mapDeltas.find(hash);
+    std::map<uint256, CAmount>::const_iterator pos = mapDeltas.find(hash);
     if (pos == mapDeltas.end())
         return;
-    const std::pair<double, CAmount>& deltas = pos->second;
-    dPriorityDelta += deltas.first;
-    nFeeDelta += deltas.second;
+    const CAmount &delta = pos->second;
+    nFeeDelta += delta;
 }
 
 void CTxMemPool::ClearPrioritisation(const uint256 hash)

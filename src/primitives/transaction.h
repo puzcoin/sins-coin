@@ -155,7 +155,7 @@ public:
 
     uint256 GetHash() const;
 
-    bool IsDust(CFeeRate minRelayTxFee) const
+    CAmount GetDustThreshold(CFeeRate minRelayTxFee) const
     {
         // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units suffs-per-kilobyte.
         // If you'd pay more than 1/3 in fees to spend something, then we consider it dust.
@@ -164,8 +164,16 @@ public:
         // and that means that fee per txout is 182 * 10000 / 1000 = 1820 suffs.
         // So dust is a txout less than 1820 *3 = 5460 suffs
         // with default -minrelaytxfee = minRelayTxFee = 10000 suffs per kB.
+        if (scriptPubKey.IsUnspendable())
+            return 0;
+        
         size_t nSize = GetSerializeSize(SER_DISK,0)+148u;
-        return (nValue < 3*minRelayTxFee.GetFee(nSize));
+        return 3*minRelayTxFee.GetFee(nSize);
+    }
+    
+    bool IsDust(CFeeRate minRelayTxFee) const
+    {
+        return (nValue < GetDustThreshold(minRelayTxFee));
     }
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)
@@ -242,9 +250,6 @@ public:
     CAmount GetValueOut() const;
     // GetValueIn() is a method on CCoinsViewCache, because
     // inputs must be known to compute value in.
-
-    // Compute priority, given priority of inputs and (optionally) tx size
-    double ComputePriority(double dPriorityInputs, unsigned int nTxSize=0) const;
 
     // Compute modified tx size for priority calculation (optionally given tx size)
     unsigned int CalculateModifiedSize(unsigned int nTxSize=0) const;

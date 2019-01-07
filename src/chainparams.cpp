@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017-2018 The SafeInsure Core developers
+// Copyright (c) 2017-2019 The SafeInsure Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -47,10 +47,12 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
     (0, uint256("00000130c84f57a7c493014d1ce1820ded6372846da945b44b170c453499d796"))
     (24550, uint256("23222f0b00b7b28248eefc81ebe56194b5a961c3be4fe09ec3030b205b3efd55"))
-    (89875, uint256("ff4960011b696074be79cb9ddce78a375553e2ecb0faf608e2d5c05845be76fd"));
+    (89875, uint256("ff4960011b696074be79cb9ddce78a375553e2ecb0faf608e2d5c05845be76fd"))
+    (160790, uint256("d4626532c209ef9363af91701d1a2b36573a9b949b4e8a7898d1965b76119ae4"));
+
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1542616277,  // * UNIX timestamp of last checkpoint block
+    1546856653,  // * UNIX timestamp of last checkpoint block
     193662,      // * total number of transactions between genesis and last checkpoint
                  //   (the tx=... number in the SetBestChain debug.log lines)
     2000         // * estimated number of transactions per day after checkpoint
