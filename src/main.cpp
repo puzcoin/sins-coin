@@ -3340,7 +3340,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                 if (it == mapStakeSpent.end()) {
                     return false;
                 }
-                if (it->second <= pindexPrev->nHeight) {
+                if (it->second < pindexPrev->nHeight) {
                     return false;
                 }
             }
@@ -3351,10 +3351,21 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
             // start at the block we're adding on to
             CBlockIndex *last = pindexPrev;
 
-            // while that block is not on the main chain
-            while (!chainActive.Contains(last) && pindexPrev != NULL) {
-                CBlock bl;
-                ReadBlockFromDisk(bl, last);
+            CBlock bl;
+            int readBlock = 0;
+            // Go backwards on the forked chain up to the split
+            while (!chainActive.Contains(last) && last != NULL) {
+                
+                if(readBlock == Params().MaxReorganizationDepth()){
+                    // Remove this chain from disk.
+                    return error("%s: forked chain longer than maximum reorg limit", __func__);
+                }                
+                if(!ReadBlockFromDisk(bl, last))
+                    // Previous block not on disk
+                    return error("%s: previous block %s not on disk", __func__, last->GetBlockHash().GetHex());
+                
+                // Increase amount of read blocks
+                readBlock++;
                 // loop through every spent input from said block
                 for (CTransaction t : bl.vtx) {
                     for (CTxIn in: t.vin) {
@@ -3363,7 +3374,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                             // if they spend the same input
                             if (stakeIn.prevout == in.prevout) {
                                 // reject the block
-                                return false;
+                                return state.DoS(100, error("%s: input already spent on a previous block",__func__));
                             }
                         }
                     }
