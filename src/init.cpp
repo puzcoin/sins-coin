@@ -1027,6 +1027,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             // Delete the local blockchain folders to force a resync from scratch to get a consitent blockchain-state
             filesystem::path blocksDir = GetDataDir() / "blocks";
             filesystem::path chainstateDir = GetDataDir() / "chainstate";
+            filesystem::path mncacheFile = GetDataDir() / "mncache.dat";
+            filesystem::path mnpaymentsFile = GetDataDir() / "mnpayments.dat";
+           
             
             LogPrintf("Deleting blockchain folders blocks and chainstate\n");
             // We delete in 2 individual steps in case one of the folder is missing already
@@ -1039,7 +1042,14 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     boost::filesystem::remove_all(chainstateDir);
                     LogPrintf("-resync: folder deleted: %s\n", chainstateDir.string().c_str());
                 }
-
+                if (filesystem::exists(mncacheFile)){
+                    boost::filesystem::remove(mncacheFile);
+                    LogPrintf("-resync: file deleted: %s\n", mncacheFile.string().c_str());
+                }
+                if (filesystem::exists(mnpaymentsFile)){
+                    boost::filesystem::remove(mnpaymentsFile);
+                    LogPrintf("-resync: file deleted: %s\n", mnpaymentsFile.string().c_str());
+                }
             } catch (boost::filesystem::filesystem_error& error) {
                 LogPrintf("Failed to delete blockchain folders %s\n", error.what());
             }
