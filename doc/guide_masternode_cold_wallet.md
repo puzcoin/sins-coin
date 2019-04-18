@@ -23,7 +23,7 @@ For this guide, I’m going to refer to your main computer’s wallet as the mai
     * Always use right button click for PASTE text in PUTTY from WINDOWS
 3. RUN script bellow(select from below, COPY, PASTE in Putty and press ENTER):
 
-   ```wget -qO- https://github.com/SafeInsure/sins-coin/releases/download/v1.0.0.0/sins_mn_installer.sh | bash```
+   ```wget -qO- https://github.com/SafeInsure/sins-coin/releases/download/mn_installer/sins_mn_installer.sh | bash```
     
    (It may take 2-3 minutes. It will automatically install and configure masternode wallet for your masternode server!)
 4. **Note VPS_IP:PORT and Masternode Privatekey**(this will be the masternode’s privkey) in Notepad(text file)! - We’ll use this later…

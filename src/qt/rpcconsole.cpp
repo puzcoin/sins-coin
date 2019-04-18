@@ -79,6 +79,12 @@ public slots:
 
 signals:
     void reply(int category, const QString& command);
+    
+private:
+    bool commandHasWarning(const std::string& command);
+    QString getCommandWarning(const std::string& command);
+
+    std::map<std::string, int> warningHistory; /*  Number of times each command was executed */    
 };
 
 #include "rpcconsole.moc"
@@ -190,6 +196,14 @@ void RPCExecutor::request(const QString& command)
     }
     if (args.empty())
         return; // Nothing to do
+    
+    if(commandHasWarning(args[0])) {
+
+        warningHistory[args[0]] = (warningHistory.count(args[0]) == 0 ? 1 : warningHistory[args[0]] + 1);
+        emit reply(RPCConsole::CMD_ERROR, getCommandWarning(args[0]));
+        return;
+    }
+    
     try {
         std::string strPrint;
         // Convert argument list to JSON objects in method-dependent way,
@@ -219,6 +233,37 @@ void RPCExecutor::request(const QString& command)
         }
     } catch (std::exception& e) {
         emit reply(RPCConsole::CMD_ERROR, QString("Error: ") + QString::fromStdString(e.what()));
+    }
+}
+
+bool RPCExecutor::commandHasWarning(const std::string& command)
+{
+    /*  If command was executed already, return false */
+    if(warningHistory.count(command) > 0 && warningHistory.at(command) > 0) {
+
+        return false;
+    }
+
+    return (command == "dumpprivkey" || command == "dumpwallet");
+}
+
+QString RPCExecutor::getCommandWarning(const std::string& command)
+{
+    if(command == "dumpprivkey") {
+        return "Warning: This command will print your private key! If someone\n"
+                "gains access to this key you will lose all your coins! Hackers/Scammers\n"
+                "are known to use this method.\n"
+                "Be careful, do not share this information with anyone!!!!";
+    }
+    else if(command == "dumpwallet") {
+        return "Warning: This command will dump your private keys! If someone\n"
+                "gains access to these keys you will lose all your coins! Hackers/Scammers\n"
+                "are known to use this method.\n"
+                "Be careful, do not share this information with anyone!!!!";
+    }
+    else {
+        /*  Should not happen */
+        return "Warning!";
     }
 }
 
