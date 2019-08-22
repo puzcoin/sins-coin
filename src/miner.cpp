@@ -421,7 +421,7 @@ bool fGenerateBitcoins = false;
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 {
-    LogPrintf("SafeInsureMiner started\n");
+    LogPrintf("SafeInsureMiner started fProofOfStake=%d\n",fProofOfStake?1:0);
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     RenameThread("safeinsure-miner");
 
@@ -440,13 +440,16 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     }
 
     while (fGenerateBitcoins || fProofOfStake) {
+	LogPrintf("BitcoinMiner loop fProofOfStake=%d\n",fProofOfStake?1:0);
         if (fProofOfStake) {
             if (chainActive.Tip()->nHeight < Params().LAST_POW_BLOCK()) {
+		LogPrintf("BitcoinMiner loop chainActive.Tip()->nHeight < Params().LAST_POW_BLOCK()\n");
                 MilliSleep(5000);
                 continue;
             }
 
-            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance() || !masternodeSync.IsSynced()) {
+            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance() /*|| !masternodeSync.IsSynced()*/) {
+		LogPrintf("BitcoinMiner loop chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance() || !masternodeSync.IsSynced()\n");
                 nLastCoinStakeSearchInterval = 0;
                 MilliSleep(5000);
                 if (!fGenerateBitcoins && !fProofOfStake)
@@ -457,6 +460,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
             {
                 if (GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight] < max(pwallet->nHashInterval, (unsigned int)1)) // wait half of the nHashDrift with max wait of 3 minutes
                 {
+		    LogPrintf("BitcoinMiner loop GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight] < max(pwallet->nHashInterval, (unsigned int)1)\n");
                     MilliSleep(5000);
                     continue;
                 }
