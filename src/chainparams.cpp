@@ -197,10 +197,9 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("node1", "node1.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node2", "node2.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node3", "node3.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node4", "node4.safeinsure.io"));
+        vSeeds.push_back(CDNSSeedData("node1", "45.249.244.140"));
+	vSeeds.push_back(CDNSSeedData("node2", "152.32.129.164"));
+	vSeeds.push_back(CDNSSeedData("node3", "207.148.127.109"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 127); // Testnet safeinsure addresses start with 't'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 20);  // Testnet safeinsure script addresses start with '9'
