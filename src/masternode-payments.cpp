@@ -288,6 +288,7 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
     CScript payee;
 
     //spork
+if(fProofOfStake) {
     if (!masternodePayments.GetBlockPayee(pindexPrev->nHeight + 1, payee)) {
         //no masternode detected
         CMasternode* winningNode = mnodeman.GetCurrentMasterNode(1);
@@ -298,7 +299,7 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
             hasPayment = false;
         }
     }
-
+}
     CAmount blockValue = GetBlockValue(pindexPrev->nHeight + 1);
     CAmount masternodePayment = GetMasternodePayment(pindexPrev->nHeight + 1, blockValue);
 
