@@ -123,11 +123,7 @@ public:
         assert(hashGenesisBlock == uint256("0x00000130c84f57a7c493014d1ce1820ded6372846da945b44b170c453499d796"));
         assert(genesis.hashMerkleRoot == uint256("0x4c0b221ab5d5e2a22efe8cc6aceed7a81b11e145f05988740cd6de38efc4be1f"));
 
-        vSeeds.push_back(CDNSSeedData("node1", "node1.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node2", "node2.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node3", "node3.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node4", "node4.safeinsure.io"));
-        vSeeds.push_back(CDNSSeedData("node5", "node5.safeinsure.io"));		
+        vSeeds.push_back(CDNSSeedData("node5", "45.249.244.140"));		
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63); // Safeinsure addresses start with 'S'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 20); // Safeinsure script addresses start with '9'
