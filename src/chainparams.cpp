@@ -87,7 +87,7 @@ public:
         pchMessageStart[2] = 0xe7;
         pchMessageStart[3] = 0x91;
         vAlertPubKey = ParseHex("04678f93351301f0209dcfd023fe0f2a58085e56a7bb0936b32e4de73f242277cf402d3995a551276762d42de4e20e1df96bb999959d3436fe38a1a58c3b8f863d");
-        nDefaultPort = 39105;
+        nDefaultPort = 30105;
         bnProofOfWorkLimit = ~uint256(0) >> 20; // SafeInsure starting difficulty is 1 / 2^12
         nSubsidyHalvingInterval = 525600; // one year
         nMaxReorganizationDepth = 100;
@@ -123,7 +123,9 @@ public:
         assert(hashGenesisBlock == uint256("0x00000130c84f57a7c493014d1ce1820ded6372846da945b44b170c453499d796"));
         assert(genesis.hashMerkleRoot == uint256("0x4c0b221ab5d5e2a22efe8cc6aceed7a81b11e145f05988740cd6de38efc4be1f"));
 
-        vSeeds.push_back(CDNSSeedData("node5", "45.249.244.140"));		
+        vSeeds.push_back(CDNSSeedData("node1", "45.249.244.140"));		
+	vSeeds.push_back(CDNSSeedData("node2", "152.32.129.164"));
+	vSeeds.push_back(CDNSSeedData("node3", "207.148.127.109"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63); // Safeinsure addresses start with 'S'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 20); // Safeinsure script addresses start with '9'

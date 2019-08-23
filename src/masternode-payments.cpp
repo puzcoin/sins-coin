@@ -299,6 +299,8 @@ if(fProofOfStake) {
             hasPayment = false;
         }
     }
+} else {
+	hasPayment = false;
 }
     CAmount blockValue = GetBlockValue(pindexPrev->nHeight + 1);
     CAmount masternodePayment = GetMasternodePayment(pindexPrev->nHeight + 1, blockValue);
