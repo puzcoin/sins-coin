@@ -97,7 +97,7 @@ public:
         nMinerThreads = 0;
         nTargetTimespan = 1 * 60; // SafeInsure: every block
         nTargetSpacing = 1 * 60;  // SafeInsure: 1 minute
-        nLastPOWBlock = 210;
+        nLastPOWBlock = 310;
         nMaturity = 100;
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 1;
