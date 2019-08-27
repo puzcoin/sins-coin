@@ -72,7 +72,7 @@ bool fCheckBlockIndex = false;
 unsigned int nCoinCacheSize = 5000;
 bool fAlerts = DEFAULT_ALERTS;
 
-unsigned int nStakeMinAge = 60 * 60;
+unsigned int nStakeMinAge = 60; //* 60; // test 1 minute nStakeMinAge
 int64_t nReserveBalance = 0;
 
 CFeeRate minRelayTxFee = CFeeRate(10000000);
